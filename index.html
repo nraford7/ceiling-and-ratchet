@@ -1,0 +1,1976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Ceiling and the Ratchet — Strategic Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* === LOGIN GATE === */
+.login-gate {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 10000;
+  background: #060606;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.login-gate.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.login-box {
+  width: 360px;
+  padding: 3rem;
+  border: 1px solid #1a1a1a;
+  background: #0c0c0c;
+}
+
+.login-box-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #d4a843;
+  opacity: 0.7;
+  margin-bottom: 2rem;
+  display: block;
+}
+
+.login-box-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: #e8e8e8;
+  margin-bottom: 0.5rem;
+}
+
+.login-box-sub {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.login-field {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: #e8e8e8;
+  background: #060606;
+  border: 1px solid #1a1a1a;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.login-field::placeholder { color: #444; }
+.login-field:focus { border-color: #d4a843; }
+
+.login-btn {
+  display: block;
+  width: 100%;
+  padding: 0.8rem;
+  margin-top: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #060606;
+  background: #d4a843;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.login-btn:hover { background: #c49a3a; }
+
+.login-error {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: #c44;
+  margin-top: 0.75rem;
+  height: 1rem;
+}
+
+:root {
+  --bg: #060606;
+  --bg-surface: #0c0c0c;
+  --bg-elevated: #111111;
+  --bg-card: #0f0f0f;
+  --border: #1a1a1a;
+  --border-active: #2a2a2a;
+  --text: #c8c8c8;
+  --text-dim: #666666;
+  --text-muted: #444444;
+  --text-bright: #e8e8e8;
+  --amber: #d4a843;
+  --amber-dim: #a07a2a;
+  --amber-glow: rgba(212, 168, 67, 0.08);
+  --red: #c44;
+  --red-dim: rgba(204, 68, 68, 0.15);
+  --green: #4a8;
+  --green-dim: rgba(68, 170, 136, 0.15);
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'DM Sans', -apple-system, sans-serif;
+}
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* === GRAIN OVERLAY === */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* === HEADER === */
+.header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(6, 6, 6, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.header-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 1rem 0 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.header-classification {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--amber);
+  opacity: 0.7;
+}
+
+.header-date {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+
+/* === NAV TABS === */
+.nav-tabs {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.nav-tabs::-webkit-scrollbar { display: none; }
+
+.nav-tab {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  border: none;
+  background: none;
+  white-space: nowrap;
+  position: relative;
+  transition: color 0.3s;
+  text-transform: uppercase;
+}
+
+.nav-tab::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 1rem; right: 1rem;
+  height: 1px;
+  background: var(--amber);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.nav-tab:hover { color: var(--text); }
+.nav-tab:hover::after { transform: scaleX(0.5); }
+
+.nav-tab.active { color: var(--amber); }
+.nav-tab.active::after { transform: scaleX(1); height: 2px; }
+
+.nav-tab .tab-num {
+  color: var(--text-muted);
+  margin-right: 0.5em;
+  font-size: 0.6rem;
+}
+
+.nav-tab.active .tab-num { color: var(--amber-dim); }
+
+/* === MAIN CONTENT === */
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  padding-top: 7.5rem;
+}
+
+/* === SECTIONS === */
+.section {
+  display: none;
+  animation: sectionIn 0.5s ease;
+  min-height: calc(100vh - 8rem);
+  padding-bottom: 6rem;
+}
+
+.section.active { display: block; }
+
+@keyframes sectionIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === TYPOGRAPHY === */
+.hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(3rem, 6.5vw, 5rem);
+  font-weight: 500;
+  color: var(--text-bright);
+  line-height: 1.08;
+  margin: 3rem 0 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--amber);
+}
+
+.hero-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 3rem;
+}
+
+.hero-lede {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text);
+  max-width: 52rem;
+  margin-bottom: 2.5rem;
+}
+
+.hero-lede strong {
+  color: var(--text-bright);
+  font-weight: 600;
+  font-family: var(--font-sans);
+}
+
+.section-heading {
+  font-family: var(--font-serif);
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-weight: 500;
+  color: var(--text-bright);
+  margin: 3rem 0 1rem;
+  line-height: 1.15;
+  max-width: 44rem;
+}
+
+.section-heading em {
+  font-style: italic;
+  color: var(--amber);
+}
+
+.section-subhead {
+  font-size: 1rem;
+  color: var(--text-dim);
+  margin-bottom: 3rem;
+  max-width: 44rem;
+  line-height: 1.7;
+}
+
+.section-body {
+  max-width: 52rem;
+}
+
+.section-body p {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+  color: var(--text);
+}
+
+.section-body p strong {
+  color: var(--text-bright);
+  font-weight: 500;
+}
+
+/* === CONSTRAINT CARDS === */
+.constraint-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin: 3rem 0;
+  max-width: 52rem;
+}
+
+.constraint-card {
+  border: 1px solid var(--border);
+  padding: 1.75rem;
+  position: relative;
+  background: var(--bg-surface);
+}
+
+.constraint-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px;
+  height: 100%;
+}
+
+.constraint-card.ceiling::before { background: var(--amber); }
+.constraint-card.ratchet::before { background: var(--red); }
+
+.constraint-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.constraint-card.ceiling .constraint-label { color: var(--amber); }
+.constraint-card.ratchet .constraint-label { color: var(--red); }
+
+.constraint-card p {
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.constraint-card .stat {
+  font-family: var(--font-mono);
+  color: var(--text-bright);
+  font-weight: 500;
+}
+
+.pull-quote {
+  font-family: var(--font-serif);
+  font-size: 1.55rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--amber);
+  border-left: 2px solid var(--amber-dim);
+  padding: 1rem 0 1rem 1.75rem;
+  margin: 2.5rem 0;
+  max-width: 44rem;
+  line-height: 1.5;
+}
+
+.bottom-line {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text-bright);
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+  line-height: 1.6;
+}
+
+/* === DATA TABLE === */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0 3rem;
+}
+
+.data-table th {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid var(--border-active);
+}
+
+.data-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+  vertical-align: top;
+}
+
+.data-table td:first-child {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-bright);
+  white-space: nowrap;
+  width: 180px;
+}
+
+.data-table .val-before { color: var(--text-dim); }
+.data-table .val-after { color: var(--text-bright); }
+.data-table .val-delta {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--red);
+  font-weight: 500;
+}
+
+.data-table tr:hover td { background: var(--bg-elevated); }
+
+/* === PLAYER CARDS === */
+.player-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin: 2.5rem 0;
+}
+
+.player-card {
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  padding: 2rem;
+  position: relative;
+  transition: border-color 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+.player-summary {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-bright);
+  line-height: 1.4;
+  margin-bottom: 1rem;
+}
+
+.player-body {
+  flex: 1;
+}
+
+.player-card:hover { border-color: var(--border-active); }
+
+.player-card-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.player-name {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--amber);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.player-tagline {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.player-card p {
+  font-size: 0.88rem;
+  line-height: 1.75;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+}
+
+.player-card p:last-child { margin-bottom: 0; }
+
+.player-card p strong {
+  color: var(--text-bright);
+  font-weight: 500;
+}
+
+.player-stat-row {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.player-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.player-stat-value {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-bright);
+}
+
+.player-stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 0.15rem;
+}
+
+.player-full-width {
+  grid-column: 1 / -1;
+}
+
+/* === SCENARIOS === */
+.scenarios-intro {
+  max-width: 52rem;
+  margin: 3rem 0;
+}
+
+.scenarios-intro h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-weight: 500;
+  color: var(--text-bright);
+  margin-bottom: 1.5rem;
+  line-height: 1.15;
+}
+
+.scenarios-intro p {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.scenarios-intro p strong {
+  color: var(--text-bright);
+  font-weight: 500;
+}
+
+.matrix-container { margin: 3rem 0; }
+
+.matrix-labels {
+  display: grid;
+  grid-template-columns: 140px 1fr 1fr;
+  grid-template-rows: auto auto auto;
+  gap: 0;
+  max-width: 800px;
+}
+
+.matrix-corner { grid-column: 1; grid-row: 1; }
+
+.matrix-col-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 0 0.5rem 0.75rem;
+}
+
+.matrix-row-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  padding-right: 1rem;
+  line-height: 1.4;
+}
+
+.matrix-cell {
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  background: var(--bg-surface);
+}
+
+.matrix-cell:hover {
+  border-color: var(--border-active);
+  background: var(--bg-elevated);
+}
+
+.matrix-cell.active {
+  border-color: var(--amber-dim);
+  background: var(--amber-glow);
+}
+
+.matrix-cell-name {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-bright);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+
+.matrix-cell-prob {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+
+.prob-high { color: var(--amber); }
+.prob-med { color: var(--text); }
+.prob-low { color: var(--text-dim); }
+
+.matrix-cell-driver {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-top: 0.5rem;
+  line-height: 1.5;
+}
+
+.scenario-detail {
+  margin-top: 2.5rem;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  padding: 2.5rem;
+  display: none;
+  animation: sectionIn 0.4s ease;
+  max-width: 800px;
+}
+
+.scenario-detail.active { display: block; }
+
+.scenario-detail-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.scenario-detail-name {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--amber);
+}
+
+.scenario-detail-prob {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.scenario-detail-condition {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.scenario-detail p {
+  font-size: 0.9rem;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+.scenario-detail p strong {
+  color: var(--text-bright);
+  font-weight: 500;
+}
+
+.scenario-break-box {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(204, 68, 68, 0.2);
+  background: var(--red-dim);
+}
+
+.scenario-break-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 0.5rem;
+}
+
+.scenario-break-box p {
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: var(--text);
+  margin-bottom: 0;
+}
+
+.wildcard-box {
+  margin-top: 3rem;
+  padding: 2rem;
+  border: 1px solid var(--amber-dim);
+  background: var(--amber-glow);
+  max-width: 800px;
+}
+
+.wildcard-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 0.75rem;
+}
+
+.wildcard-box p {
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: var(--text);
+}
+
+/* === IMPLICATIONS === */
+.advantage-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  margin: 2.5rem 0;
+}
+
+.advantage-card {
+  border: 1px solid var(--border);
+  padding: 2rem;
+  background: var(--bg-surface);
+  position: relative;
+  transition: border-color 0.3s;
+}
+
+.advantage-card:hover { border-color: var(--border-active); }
+
+.advantage-card::before {
+  content: attr(data-num);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  letter-spacing: 0.1em;
+}
+
+.advantage-title {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--amber);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 1rem;
+}
+
+.advantage-card p {
+  font-size: 0.88rem;
+  line-height: 1.75;
+  color: var(--text);
+}
+
+.cadence-block {
+  margin: 3rem 0;
+  padding: 2rem;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  max-width: 52rem;
+}
+
+.cadence-block h3 {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 1rem;
+}
+
+.cadence-block p {
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: var(--text);
+}
+
+.inflection-section {
+  margin: 3rem 0;
+  max-width: 52rem;
+}
+
+.inflection-section h3 {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 1.5rem;
+}
+
+.inflection-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.inflection-item {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 1.5rem;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.inflection-date {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--amber);
+  font-weight: 500;
+}
+
+.inflection-item p {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+/* === SHIFTS === */
+.shift-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 2rem 0;
+  max-width: 52rem;
+}
+
+.shift-item {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr;
+  gap: 1rem;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--border);
+  align-items: start;
+}
+
+.shift-marker {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--amber-dim);
+  padding-top: 0.15rem;
+}
+
+.shift-item p {
+  font-size: 0.92rem;
+  line-height: 1.75;
+  color: var(--text);
+}
+
+.shift-item p strong {
+  color: var(--text-bright);
+  font-weight: 500;
+}
+
+.watch-section {
+  margin: 3rem 0;
+  max-width: 52rem;
+}
+
+.watch-section h3 {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 1.5rem;
+}
+
+.watch-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.watch-item {
+  border: 1px solid var(--border);
+  padding: 1.25rem;
+  background: var(--bg-surface);
+}
+
+.watch-item-num {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.1em;
+}
+
+.watch-item-title {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-bright);
+  margin-bottom: 0.5rem;
+}
+
+.watch-item p {
+  font-size: 0.82rem;
+  line-height: 1.65;
+  color: var(--text-dim);
+}
+
+/* === FAQ === */
+.faq-grid {
+  max-width: 52rem;
+  margin: 2.5rem 0;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--border);
+  padding: 0;
+}
+
+.faq-question {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 1.5rem 2.5rem 1.5rem 0;
+  cursor: pointer;
+  position: relative;
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text-bright);
+  line-height: 1.35;
+  transition: color 0.2s;
+}
+
+.faq-question:hover { color: var(--amber); }
+
+.faq-question::after {
+  content: '+';
+  position: absolute;
+  right: 0;
+  top: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 300;
+  color: var(--text-muted);
+  transition: transform 0.3s, color 0.3s;
+}
+
+.faq-item.open .faq-question::after {
+  content: '\2212';
+  color: var(--amber);
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.3s ease;
+}
+
+.faq-item.open .faq-answer {
+  max-height: 600px;
+  padding-bottom: 1.5rem;
+}
+
+.faq-answer p {
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+  padding-right: 2rem;
+}
+
+.faq-answer p:last-child { margin-bottom: 0; }
+
+.faq-answer p strong {
+  color: var(--text-bright);
+  font-weight: 500;
+}
+
+/* === CLOSING === */
+.closing {
+  margin: 4rem 0 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid var(--border);
+  max-width: 52rem;
+}
+
+.closing p {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+/* === FOOTER === */
+.footer {
+  margin-top: 6rem;
+  padding: 2rem 0;
+  border-top: 1px solid var(--border);
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer p {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .main { padding: 0 1.25rem; padding-top: 7rem; }
+  .header-inner { padding: 0 1.25rem; }
+  .nav-tab { font-size: 0.6rem; padding: 0.75rem 0.6rem; }
+  .constraint-cards { grid-template-columns: 1fr; }
+  .player-grid { grid-template-columns: 1fr; }
+  .player-full-width { grid-column: 1; }
+  .matrix-labels { grid-template-columns: 80px 1fr 1fr; }
+  .matrix-cell { padding: 1rem; }
+  .matrix-cell-prob { font-size: 1.1rem; }
+  .matrix-cell-driver { display: none; }
+  .advantage-cards { grid-template-columns: 1fr; }
+  .watch-grid { grid-template-columns: 1fr; }
+  .inflection-item { grid-template-columns: 1fr; gap: 0.25rem; }
+  .data-table td:first-child { white-space: normal; width: 120px; }
+  .footer-inner { flex-direction: column; gap: 0.5rem; }
+}
+
+@media (max-width: 480px) {
+  .hero-title { font-size: 2.2rem; }
+  .nav-tab { font-size: 0.55rem; padding: 0.65rem 0.4rem; }
+  .nav-tab .tab-num { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN GATE -->
+<div class="login-gate" id="loginGate">
+  <div class="login-box">
+    <span class="login-box-label">Scenario-2026-001 &mdash; Restricted</span>
+    <div class="login-box-title">Access Required</div>
+    <div class="login-box-sub">This briefing is restricted to authorized personnel.</div>
+    <form id="loginForm" onsubmit="return handleLogin(event)">
+      <input class="login-field" type="text" id="loginUser" placeholder="Username" autocomplete="off" autofocus>
+      <input class="login-field" type="password" id="loginPass" placeholder="Password" autocomplete="off">
+      <button class="login-btn" type="submit">Enter</button>
+    </form>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="header-top">
+      <span class="header-classification">Scenario-2026-001 &mdash; Executive Summary</span>
+      <span class="header-date">08 MAR 2026</span>
+    </div>
+    <nav class="nav-tabs" role="tablist">
+      <button class="nav-tab active" role="tab" data-tab="situation">
+        <span class="tab-num">01</span>The Situation
+      </button>
+      <button class="nav-tab" role="tab" data-tab="environment">
+        <span class="tab-num">02</span>Environment
+      </button>
+      <button class="nav-tab" role="tab" data-tab="players">
+        <span class="tab-num">03</span>The Players
+      </button>
+      <button class="nav-tab" role="tab" data-tab="scenarios">
+        <span class="tab-num">04</span>Four Scenarios
+      </button>
+      <button class="nav-tab" role="tab" data-tab="implications">
+        <span class="tab-num">05</span>Implications
+      </button>
+      <button class="nav-tab" role="tab" data-tab="shifts">
+        <span class="tab-num">06</span>Structural Shifts
+      </button>
+      <button class="nav-tab" role="tab" data-tab="faq">
+        <span class="tab-num">07</span>FAQ
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- ==================== 01: THE SITUATION ==================== -->
+  <section class="section active" id="situation" role="tabpanel">
+    <h1 class="hero-title">The Ceiling <em>&amp;</em> the Ratchet</h1>
+    <p class="hero-subtitle">A Strategic Assessment for UAE-Based Leadership</p>
+
+    <p class="hero-lede">
+      Eight days into the joint US-Israeli air campaign against Iran, the coalition has total air superiority, has struck 3,000+ targets, and killed the Supreme Leader. And yet <strong style="font-family: var(--font-serif); font-weight: 600;">none of its four stated objectives has been fully achieved. And they won't be &mdash; not with their current strategy alone.</strong>
+    </p>
+
+    <div class="section-body">
+      <p>
+        The reason is architectural. On March 1, Iran activated its <strong>Mosaic Defense</strong> doctrine &mdash; a wartime protocol that distributes full tactical authority to 31 autonomous provincial units across the country. Each unit has independent weapons arsenals, named successors three ranks deep, and explicit authorization to act without consulting Tehran. The system was designed to survive exactly this kind of decapitation. It is functioning as designed.
+      </p>
+      <p>
+        Beneath this command structure sits a distributed drone industrial base: ~100 hardened underground facilities producing ~200 units per day at $35,000 each. The production is cheap, dispersed, and buried. This is not a problem air power can solve.
+      </p>
+      <p>
+        This reality creates a race between two physical constraints &mdash; the ceiling and the ratchet &mdash; and the next four to eight weeks are defined by which one bites first.
+      </p>
+    </div>
+
+    <div class="constraint-cards">
+      <div class="constraint-card ceiling">
+        <div class="constraint-label">The Ceiling</div>
+        <p style="font-family: var(--font-serif); font-size: 1.1rem; font-weight: 500; color: var(--text-bright); margin-bottom: 1rem; line-height: 1.4;">
+          The campaign hits a hard munitions limit at 8-12 weeks. This is not a political constraint. It is physics.
+        </p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+          <div style="padding: 0.75rem; border: 1px solid var(--border); background: var(--bg);">
+            <div style="font-family: var(--font-mono); font-size: 1.1rem; font-weight: 500; color: var(--amber);">1 week</div>
+            <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.2rem;">Patriot annual production consumed</div>
+          </div>
+          <div style="padding: 0.75rem; border: 1px solid var(--border); background: var(--bg);">
+            <div style="font-family: var(--font-mono); font-size: 1.1rem; font-weight: 500; color: var(--amber);">12-24 mo</div>
+            <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.2rem;">Lead time for PGM replacements</div>
+          </div>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-dim); line-height: 1.65;">
+          Raytheon produces ~500 PAC-3 missiles per year. THAAD and SM-3 interceptors take 2-3 years to manufacture. The ceiling is a materials science constraint with a date attached.
+        </p>
+      </div>
+      <div class="constraint-card ratchet">
+        <div class="constraint-label">The Ratchet</div>
+        <p style="font-family: var(--font-serif); font-size: 1.1rem; font-weight: 500; color: var(--text-bright); margin-bottom: 1rem; line-height: 1.4;">
+          Two turns. First: defenses deplete. Second: the risk of being drawn into the war rises daily.
+        </p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+          <div style="padding: 0.75rem; border: 1px solid var(--border); background: var(--bg);">
+            <div style="font-family: var(--font-mono); font-size: 1.1rem; font-weight: 500; color: var(--red);">20-28:1</div>
+            <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.2rem;">Cost ratio favoring attacker</div>
+          </div>
+          <div style="padding: 0.75rem; border: 1px solid var(--border); background: var(--bg);">
+            <div style="font-family: var(--font-mono); font-size: 1.1rem; font-weight: 500; color: var(--red);">800+</div>
+            <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.2rem;">Interceptors consumed in 5 days</div>
+          </div>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-dim); line-height: 1.65;">
+          As stockpiles thin, each barrage that gets through raises the risk of a critical strike on desalination, power, or transport. A single hit on the wrong target creates a humanitarian crisis that forces a response &mdash; collapsing the "host, not belligerent" firewall and drawing Gulf states into active combat. That probability rises every day the campaign continues.
+        </p>
+      </div>
+    </div>
+
+    <p class="hero-lede" style="margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid var(--border); font-weight: 500; color: var(--text-bright);">
+      The ceiling falls. The ratchet turns. The next four to eight weeks are a race between them.
+    </p>
+  </section>
+
+  <!-- ==================== 02: OPERATING ENVIRONMENT ==================== -->
+  <section class="section" id="environment" role="tabpanel">
+    <h2 class="section-heading">Iran did not close the Strait of Hormuz. <em>Lloyd's of London did.</em></h2>
+    <p class="section-subhead">
+      The insurance architecture that makes global maritime trade possible collapsed within 72 hours. Here is what has already happened to your operating environment:
+    </p>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Before</th>
+          <th>Now</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Oil</td>
+          <td class="val-before">Brent ~$66/bbl</td>
+          <td class="val-after">$92.69/bbl</td>
+          <td class="val-delta">+36%</td>
+        </tr>
+        <tr>
+          <td>Strait of Hormuz</td>
+          <td class="val-before">~138 vessel crossings/day</td>
+          <td class="val-after">~5 crossings/day</td>
+          <td class="val-delta">-96%</td>
+        </tr>
+        <tr>
+          <td>Flights</td>
+          <td class="val-before">Normal operations</td>
+          <td class="val-after">23,000+ cancelled</td>
+          <td class="val-delta">&mdash;</td>
+        </tr>
+        <tr>
+          <td>Dubai Tourism</td>
+          <td class="val-before">Record bookings</td>
+          <td class="val-after">80% hotel cancellations</td>
+          <td class="val-delta">~$500M/day</td>
+        </tr>
+        <tr>
+          <td>Insurance</td>
+          <td class="val-before">Functioning market</td>
+          <td class="val-after">7 P&I clubs withdrew war risk cover</td>
+          <td class="val-delta">Collapsed</td>
+        </tr>
+        <tr>
+          <td>Cloud Infra</td>
+          <td class="val-before">Operational</td>
+          <td class="val-after">AWS Middle East region offline</td>
+          <td class="val-delta">Direct strike</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ==================== 03: THE PLAYERS ==================== -->
+  <section class="section" id="players" role="tabpanel">
+    <h2 class="section-heading">The Players <em>&amp;</em> Their Constraints</h2>
+    <p class="section-subhead">
+      Four actors, each operating under structural pressures they did not choose. Their constraints &mdash; not their intentions &mdash; will determine what happens next.
+    </p>
+
+    <div class="player-grid">
+
+      <!-- United States -->
+      <div class="player-card">
+        <div class="player-card-header">
+          <span class="player-name">United States</span>
+          <span class="player-tagline">Victory without a definition</span>
+        </div>
+        <div class="player-summary">Needs a quick, declarable win but has set objectives that require a long war &mdash; on the weakest public support of any major US military operation in modern history.</div>
+        <div class="player-body">
+          <p>
+            Trump's stated objectives &mdash; destroy missile capability, annihilate navy, prevent weapons development, achieve "unconditional surrender" &mdash; describe a war that cannot be won in the timeline he has set. He projected 4-5 weeks; VP Vance contradicts: <strong>"no way Donald Trump is going to allow a multi-year conflict."</strong>
+          </p>
+          <p>
+            Congressional margins are razor-thin &mdash; six Senate votes, seven House votes from reversal. The MAGA coalition is fracturing: Tucker Carlson publicly criticized the strikes. Oil has moved from ~$63 to ~$88 (+35.6% weekly). Sustained $100+ has preceded every US recession since 1973. Trump's behavioral history &mdash; June 2019 Iran strike cancellation, Abraham Accords, North Korea summits &mdash; points toward maximum pressure followed by theatrical diplomacy.
+          </p>
+        </div>
+        <div class="player-stat-row">
+          <div class="player-stat">
+            <span class="player-stat-value">28%</span>
+            <span class="player-stat-label">Public support</span>
+          </div>
+          <div class="player-stat">
+            <span class="player-stat-value">~Apr 29</span>
+            <span class="player-stat-label">War Powers deadline</span>
+          </div>
+          <div class="player-stat">
+            <span class="player-stat-value">6 / 7</span>
+            <span class="player-stat-label">Senate / House votes from reversal</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Israel -->
+      <div class="player-card">
+        <div class="player-card-header">
+          <span class="player-name">Israel</span>
+          <span class="player-tagline">The maximizing window</span>
+        </div>
+        <div class="player-summary">Racing to maximize gains before the US window closes &mdash; 70% of the way to its objectives, running out of time, and facing unilateral action if Washington pulls back.</div>
+        <div class="player-body">
+          <p>
+            Israel understands the permissive US environment as time-limited. The divergence becomes acute at week 4-5: the US wants a declarable victory and exit; Israel wants permanent threat elimination with no exit strategy.
+          </p>
+          <p>
+            The campaign against Iran's programs is assessed at ~70% achieved: Fordow inoperable, Natanz severely damaged, 14+ scientists killed. But 440 kg of enriched material remains unaccounted for. The IDF is exhausted &mdash; continuous operations for 2.5 years since October 7. Reservist participation below 50% of surge levels. Netanyahu's calculus: either the leader who neutralized the existential threat or the PM indicted for corruption.
+          </p>
+        </div>
+        <div class="player-stat-row">
+          <div class="player-stat">
+            <span class="player-stat-value">~70%</span>
+            <span class="player-stat-label">Campaign assessed</span>
+          </div>
+          <div class="player-stat">
+            <span class="player-stat-value">$3B/wk</span>
+            <span class="player-stat-label">Campaign cost</span>
+          </div>
+          <div class="player-stat">
+            <span class="player-stat-value">Oct 27</span>
+            <span class="player-stat-label">Elections</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Iran -->
+      <div class="player-card">
+        <div class="player-card-header">
+          <span class="player-name">Iran</span>
+          <span class="player-tagline">Decapitated but distributed</span>
+        </div>
+        <div class="player-summary">Leadership destroyed, but the system was built to fight without leaders &mdash; 31 autonomous units with independent arsenals, a parallel economy, and a kill chain already half-activated.</div>
+        <div class="player-body">
+          <p>
+            Iran has lost two generations of senior leadership in nine months &mdash; ~40-49 officials killed including the Supreme Leader, his replacement, Defense Minister, Armed Forces Chief, and all four senior IRGC intelligence chiefs. The intelligence apparatus that would manage succession has itself been destroyed.
+          </p>
+          <p>
+            But the Mosaic Defense was designed for this. The IRGC's economic empire &mdash; controlling 25-50% of GDP through 812+ companies &mdash; means it can sustain operations independently of any civilian government. Drone attrition: active. Insurance warfare: active. Cyber attacks: escalating. Two layers remain in reserve. The Houthis operate independently and may act without Iranian authorization.
+          </p>
+        </div>
+        <div class="player-stat-row">
+          <div class="player-stat">
+            <span class="player-stat-value">31</span>
+            <span class="player-stat-label">Autonomous units</span>
+          </div>
+          <div class="player-stat">
+            <span class="player-stat-value">~200/day</span>
+            <span class="player-stat-label">Drone production</span>
+          </div>
+          <div class="player-stat">
+            <span class="player-stat-value">4 of 6</span>
+            <span class="player-stat-label">Kill chain layers active</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gulf States -->
+      <div class="player-card">
+        <div class="player-card-header">
+          <span class="player-name">Gulf States</span>
+          <span class="player-tagline">Endurance as strategy</span>
+        </div>
+        <div class="player-summary">Absorbing massive strikes while refusing to retaliate &mdash; the most important strategic decision in this conflict, but one with a ticking clock as interceptor stocks and water reserves run down.</div>
+        <div class="player-body">
+          <p>
+            The UAE absorbed 189 ballistic missiles, 941 drones, and 3 cruise missiles between February 28 and March 4. Its strategic posture remained unchanged: <strong>"host, not belligerent."</strong> This distinction is the firewall constraining Iran's targeting &mdash; every step toward active combat widens the target set.
+          </p>
+          <p>
+            But the firewall has a burn rate. 800+ Patriot interceptors consumed in 5 days at $2.4B+. Abu Dhabi's strategic water reserve is 48 hours. The Gulf's most potent asymmetric capability is financial: ~$6 trillion in sovereign wealth, $2T+ in US assets. The dual posture becomes unsustainable beyond 60-90 days.
+          </p>
+        </div>
+        <div class="player-stat-row">
+          <div class="player-stat">
+            <span class="player-stat-value">48hrs</span>
+            <span class="player-stat-label">Water reserve</span>
+          </div>
+          <div class="player-stat">
+            <span class="player-stat-value">$6T</span>
+            <span class="player-stat-label">Sovereign wealth</span>
+          </div>
+          <div class="player-stat">
+            <span class="player-stat-value">60-90d</span>
+            <span class="player-stat-label">Posture sustainability</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== 04: FOUR SCENARIOS ==================== -->
+  <section class="section" id="scenarios" role="tabpanel">
+    <div class="scenarios-intro">
+      <h2>Two Questions</h2>
+      <p style="font-family: var(--font-serif); font-size: 1.3rem; font-weight: 400; line-height: 1.55; color: var(--text-bright); margin-bottom: 2rem;">
+        Everything that happens next &mdash; to this region, to the global economy, to your business &mdash; flows from the answers to two questions. They will define the next eight weeks. They may define the coming years.
+      </p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1.5rem 0;">
+        <div style="border: 1px solid var(--border); background: var(--bg-surface); padding: 2rem; border-left: 3px solid var(--amber);">
+          <div style="font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.75rem;">Question 01</div>
+          <p style="font-family: var(--font-serif); font-size: 1.15rem; font-weight: 700; color: var(--text-bright); line-height: 1.35; margin-bottom: 1rem;">Will the US escalate or hold course toward exit?</p>
+          <p style="font-size: 0.88rem; line-height: 1.75; color: var(--text);">At 28% public support, munitions exhaustion at 8-12 weeks, oil approaching recession thresholds, and the War Powers deadline of April 29, structural pressure favors de-escalation. But a significant escalatory event could override every de-escalation incentive overnight.</p>
+        </div>
+        <div style="border: 1px solid var(--border); background: var(--bg-surface); padding: 2rem; border-left: 3px solid var(--amber);">
+          <div style="font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.75rem;">Question 02</div>
+          <p style="font-family: var(--font-serif); font-size: 1.15rem; font-weight: 700; color: var(--text-bright); line-height: 1.35; margin-bottom: 1rem;">Will the GCC be drawn into belligerency?</p>
+          <p style="font-size: 0.88rem; line-height: 1.75; color: var(--text);">The UAE's "host, not belligerent" posture is the single most important strategic decision in this conflict. Every step toward active combat widens Iran's target set. But the posture has a burn rate: interceptor depletion at weeks 3-6 opens a window where civilian infrastructure &mdash; including desalination plants serving a country with 48 hours of water reserves &mdash; becomes vulnerable.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2 style="font-family: var(--font-serif); font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 500; color: var(--text-bright); margin: 3rem 0 0.5rem; line-height: 1.15;">Four Scenarios</h2>
+    <p style="font-size: 0.95rem; color: var(--text-dim); margin-bottom: 1rem; max-width: 44rem;">These two questions produce a 2&times;2 matrix. Click any scenario to see the detail.</p>
+
+    <!-- The Matrix -->
+    <div class="matrix-container">
+      <div class="matrix-labels">
+        <div class="matrix-corner"></div>
+        <div class="matrix-col-label">US Holds Course / De-escalates</div>
+        <div class="matrix-col-label">US Escalates</div>
+
+        <div class="matrix-row-label">GCC Endures</div>
+        <div class="matrix-cell active" data-scenario="ceiling" onclick="showScenario('ceiling')">
+          <div class="matrix-cell-name">The Ceiling</div>
+          <div class="matrix-cell-prob prob-high">40-45%</div>
+          <div class="matrix-cell-driver">Munitions constraint, Trump behavioral pattern, GCC discipline</div>
+        </div>
+        <div class="matrix-cell" data-scenario="quagmire" onclick="showScenario('quagmire')">
+          <div class="matrix-cell-name">The Quagmire</div>
+          <div class="matrix-cell-prob prob-med">25-30%</div>
+          <div class="matrix-cell-driver">Escalatory trigger, proxy widening, mission creep</div>
+        </div>
+
+        <div class="matrix-row-label">GCC Drawn In</div>
+        <div class="matrix-cell" data-scenario="trap" onclick="showScenario('trap')">
+          <div class="matrix-cell-name">The Trap Springs</div>
+          <div class="matrix-cell-prob prob-low">10-15%</div>
+          <div class="matrix-cell-driver">Interceptor depletion, Houthi independence, desalination vulnerability</div>
+        </div>
+        <div class="matrix-cell" data-scenario="conflagration" onclick="showScenario('conflagration')">
+          <div class="matrix-cell-name">The Conflagration</div>
+          <div class="matrix-cell-prob prob-low">5-10%</div>
+          <div class="matrix-cell-driver">Cascade from Quagmire + GCC defense failure</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scenario Details -->
+    <div class="scenario-detail active" id="detail-ceiling">
+      <div class="scenario-detail-header">
+        <span class="scenario-detail-name">The Ceiling</span>
+        <span class="scenario-detail-prob">40-45%</span>
+        <span class="scenario-detail-condition">GCC endures + US holds course</span>
+      </div>
+      <p>
+        The ceiling wins the race. The air campaign continues at current intensity for 3-5 weeks. GCC interceptor stocks deplete but are partially replenished through emergency resupply. No catastrophic infrastructure hit materializes. The UAE and Saudi Arabia maintain "host not belligerent" posture throughout, absorbing significant economic damage but preserving the targeting firewall.
+      </p>
+      <p>
+        Trump, facing the convergence of munitions exhaustion, oil approaching $100, the War Powers deadline, and MAGA base fracture, follows his behavioral precedent of maximum pressure to theatrical exit. He declares objectives "substantially achieved." Khamenei's death is the centerpiece: decapitation framed as strategic victory.
+      </p>
+      <p>
+        <strong>Recoverable</strong> &mdash; but the insurance architecture, the risk premium on Gulf assets, and the "Gulf is safe" narrative are permanently altered. Oil settles to $80-85. Strait reopens in 3-6 months. Sporadic attacks persist for weeks but the systematic campaign collapses.
+      </p>
+      <div class="scenario-break-box">
+        <div class="scenario-break-label">What Breaks This Scenario</div>
+        <p>A significant escalatory event &mdash; American military losses or the discovery of advanced weapons material in a threatening context &mdash; that generates rally-around-the-flag and gives the administration political permission to deepen the campaign.</p>
+      </div>
+    </div>
+
+    <div class="scenario-detail" id="detail-quagmire">
+      <div class="scenario-detail-header">
+        <span class="scenario-detail-name">The Quagmire</span>
+        <span class="scenario-detail-prob">25-30%</span>
+        <span class="scenario-detail-condition">GCC endures + US escalates</span>
+      </div>
+      <p>
+        The US escalates after a triggering event &mdash; significant military losses, intelligence discoveries, or proxy widening. GCC maintains defensive posture. Campaign extends 6-18 months. Ground troops trigger all remaining layers of Iran's kill chain &mdash; terrorism, mining, infrastructure targeting &mdash; simultaneously.
+      </p>
+      <p>
+        Oil sustained at $95-110+. Strait reopening: 12-18 months. The paradox: the harder the coalition hits, the more distributed the threat becomes. A fractured Iran with autonomous provincial commanders is <strong>more dangerous</strong> than a unified one.
+      </p>
+      <div class="scenario-break-box">
+        <div class="scenario-break-label">Escalation Sequence</div>
+        <p>Triggering event &rarr; retaliation &rarr; intelligence discovery &rarr; "limited" ground operation &rarr; force protection &rarr; mission creep. Each step individually rational and locally justified.</p>
+      </div>
+    </div>
+
+    <div class="scenario-detail" id="detail-trap">
+      <div class="scenario-detail-header">
+        <span class="scenario-detail-name">The Trap Springs</span>
+        <span class="scenario-detail-prob">10-15%</span>
+        <span class="scenario-detail-condition">GCC drawn in + US holds course</span>
+      </div>
+      <p>
+        The US maintains its de-escalation trajectory but GCC defenses fail before the campaign ends. Interceptor depletion leaves desalination plants exposed. A single strike on Jebel Ali or Taweelah &mdash; 48-hour water reserves &mdash; creates a humanitarian crisis that forces a response.
+      </p>
+      <p>
+        GCC entry collapses the targeting firewall. Iran reframes Gulf states as combatants, activating its reserved capabilities against Gulf critical infrastructure. <strong>Structurally unstable:</strong> cascades back to the Ceiling or forward to the Conflagration.
+      </p>
+      <div class="scenario-break-box">
+        <div class="scenario-break-label">Key Risk</div>
+        <p>The trigger may come from Houthis &mdash; operationally independent, better armed than 2022, capable and motivated to strike Saudi desalination without Iranian authorization.</p>
+      </div>
+    </div>
+
+    <div class="scenario-detail" id="detail-conflagration">
+      <div class="scenario-detail-header">
+        <span class="scenario-detail-name">The Conflagration</span>
+        <span class="scenario-detail-prob">5-10%</span>
+        <span class="scenario-detail-condition">GCC drawn in + US escalates</span>
+      </div>
+      <p>
+        Both triggers fire. Regional war across multiple theaters with no clear off-ramp. The Strait is physically mined &mdash; 5,000-6,000 mines, clearance timeline measured in months. Oil at $120-150+. Global recession guaranteed. Qatar's 20% global LNG share offline; South Korea has 9 days of LNG reserves. China's $210B/year added import cost.
+      </p>
+      <p>
+        Gulf financial leverage &mdash; $2T+ in US assets &mdash; becomes a coercive tool for forcing de-escalation. Terrorism goes global. Cyber operations target energy grids, desalination SCADA, financial infrastructure.
+      </p>
+      <div class="scenario-break-box">
+        <div class="scenario-break-label">Why It Matters</div>
+        <p>Unlikely &mdash; requires simultaneous failure of multiple safeguards. Cannot be dismissed &mdash; ground deployment is a single event that activates most escalation layers simultaneously.</p>
+      </div>
+    </div>
+
+    <!-- Wild Card -->
+    <div class="wildcard-box">
+      <div class="wildcard-label">Wild Card &mdash; 440 Kilograms</div>
+      <p>
+        Across all four scenarios, 440 kg of enriched uranium remains unaccounted for. Its discovery in a threatening context overrides every other dynamic simultaneously &mdash; for Israel, for the US, and for Iran. The IAEA assesses Iran could resume enrichment "in a matter of months." This variable determines whether the campaign's gains are measured in years or in months.
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== 05: STRATEGIC IMPLICATIONS ==================== -->
+  <section class="section" id="implications" role="tabpanel">
+    <h2 class="section-heading">What This Means For You</h2>
+
+    <div class="pull-quote">
+      The pre-conflict strategic plan describes a world that no longer exists.
+    </div>
+
+    <div class="section-body">
+      <p>
+        The four scenarios demand different responses. But you do not know which scenario you are in, and the trajectory will be determined within weeks by variables you do not control. The strategic framework must span all four. That means one objective:
+      </p>
+    </div>
+
+    <div style="border: 2px solid var(--amber-dim); background: var(--amber-glow); padding: 2rem 2.5rem; margin: 2rem 0 2.5rem; max-width: 52rem;">
+      <div style="font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.75rem;">Core Strategic Objective</div>
+      <p style="font-family: var(--font-serif); font-size: 1.45rem; font-weight: 500; color: var(--text-bright); line-height: 1.45; margin: 0;">
+        Preserve the capacity to operate and compete through 3-18 months of disruption, while positioning to capture recovery upside.
+      </p>
+    </div>
+
+    <div style="max-width: 52rem; margin: 2.5rem 0 0;">
+      <div style="font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 1.5rem;">Four advantages determine who emerges strongest</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0; max-width: 52rem; margin-bottom: 2.5rem;">
+
+      <div style="display: grid; grid-template-columns: 3.5rem 1fr; border-bottom: 1px solid var(--border); padding: 1.75rem 0;">
+        <div style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 300; color: var(--amber); line-height: 1;">01</div>
+        <div>
+          <div style="display: flex; align-items: baseline; gap: 1rem; margin-bottom: 0.5rem;">
+            <span style="font-family: var(--font-serif); font-size: 1.3rem; font-weight: 600; color: var(--text-bright);">Balance Sheet</span>
+            <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--amber); letter-spacing: 0.05em;">DO THIS WEEK</span>
+          </div>
+          <p style="font-size: 0.9rem; line-height: 1.75; color: var(--text); margin: 0;">Cash is the universal hedge against scenario uncertainty. Draw credit facilities now, while banks are still lending at pre-conflict terms. Fitch rates GCC banks "well buffered" &mdash; that assessment applies to their capital ratios, not their willingness to extend new credit six months into a regional war.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 3.5rem 1fr; border-bottom: 1px solid var(--border); padding: 1.75rem 0;">
+        <div style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 300; color: var(--amber); line-height: 1;">02</div>
+        <div>
+          <div style="display: flex; align-items: baseline; gap: 1rem; margin-bottom: 0.5rem;">
+            <span style="font-family: var(--font-serif); font-size: 1.3rem; font-weight: 600; color: var(--text-bright);">Talent</span>
+            <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--amber); letter-spacing: 0.05em;">DO THIS MONTH</span>
+          </div>
+          <p style="font-size: 0.9rem; line-height: 1.75; color: var(--text); margin: 0;">The 5-25% high-skilled expatriate departure concentrates in exactly the people hardest to replace &mdash; families with school-age children, professionals with portable careers in finance and technology. Individual retention conversations with your top 50-100 people are worth more than any policy memo. Have their direct managers make the call, not HR.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 3.5rem 1fr; border-bottom: 1px solid var(--border); padding: 1.75rem 0;">
+        <div style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 300; color: var(--amber); line-height: 1;">03</div>
+        <div>
+          <div style="display: flex; align-items: baseline; gap: 1rem; margin-bottom: 0.5rem;">
+            <span style="font-family: var(--font-serif); font-size: 1.3rem; font-weight: 600; color: var(--text-bright);">Speed</span>
+            <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--amber); letter-spacing: 0.05em;">ONGOING</span>
+          </div>
+          <p style="font-size: 0.9rem; line-height: 1.75; color: var(--text); margin: 0;">Every company faces the same disruption. The ones that cut costs, reroute supply chains, and communicate with stakeholders in days outperform those that act in weeks. If you have not already rerouted Hormuz-dependent shipping and frozen discretionary spending, you are behind.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 3.5rem 1fr; border-bottom: 1px solid var(--border); padding: 1.75rem 0;">
+        <div style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 300; color: var(--amber); line-height: 1;">04</div>
+        <div>
+          <div style="display: flex; align-items: baseline; gap: 1rem; margin-bottom: 0.5rem;">
+            <span style="font-family: var(--font-serif); font-size: 1.3rem; font-weight: 600; color: var(--text-bright);">Information</span>
+            <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--amber); letter-spacing: 0.05em;">DAILY</span>
+          </div>
+          <p style="font-size: 0.9rem; line-height: 1.75; color: var(--text); margin: 0;">Seven observable signals determine which scenario materializes. The company tracking them daily has a 48-hour decision advantage that compounds over weeks. Assign one person to deliver a daily one-page briefing. That advantage is the single greatest differentiator between companies that navigate this well and those that don't.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="cadence-block">
+      <h3>Wartime Management Cadence</h3>
+      <p>
+        Daily situation updates. Weekly strategic assessments. Pre-authorized trigger-decision protocols: when oil sustains above $100, when a second infrastructure outage hits, when interceptor depletion reports emerge &mdash; the response executes in hours, not days. Stakeholder communication shifts from quarterly to continuous.
+      </p>
+    </div>
+
+    <div class="inflection-section">
+      <h3>Three Approaching Inflection Points</h3>
+      <div class="inflection-items">
+        <div class="inflection-item">
+          <div class="inflection-date">April 1</div>
+          <p>P&I club renewal determines whether the insurance closure becomes structural or begins to normalize.</p>
+        </div>
+        <div class="inflection-item">
+          <div class="inflection-date">Weeks 3-6</div>
+          <p>The interceptor depletion window determines whether civilian infrastructure becomes vulnerable to penetrating strikes.</p>
+        </div>
+        <div class="inflection-item">
+          <div class="inflection-date">~April 29</div>
+          <p>The War Powers Resolution forces a Congressional decision. By the time it arrives, your strategic choices must already be made.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 06: STRUCTURAL SHIFTS ==================== -->
+  <section class="section" id="shifts" role="tabpanel">
+    <div class="shifts-header">
+      <h2 class="section-heading">Permanent Changes</h2>
+      <p class="section-subhead">Regardless of which scenario materializes, certain changes are irreversible:</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0; max-width: 52rem; margin: 2rem 0;">
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--border); padding: 1.5rem 0; gap: 2rem;">
+        <div>
+          <div style="font-family: var(--font-serif); font-size: 1.05rem; font-weight: 600; color: var(--text-bright); margin-bottom: 0.5rem;">Shipping costs go up permanently</div>
+          <p style="font-size: 0.85rem; line-height: 1.7; color: var(--text-dim); margin: 0;">Gulf maritime insurance will never return to pre-conflict pricing. The structural cost increase is $2-5B annually across the region.</p>
+        </div>
+        <div style="border-left: 1px solid var(--border); padding-left: 2rem;">
+          <div style="font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.4rem;">So What</div>
+          <p style="font-size: 0.85rem; line-height: 1.7; color: var(--text); margin: 0;">Every business that imports or exports through the Gulf pays more &mdash; forever. Renegotiate supplier contracts now. Budget for higher freight as a permanent line item, not a temporary surcharge.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--border); padding: 1.5rem 0; gap: 2rem;">
+        <div>
+          <div style="font-family: var(--font-serif); font-size: 1.05rem; font-weight: 600; color: var(--text-bright); margin-bottom: 0.5rem;">Hormuz is no longer a given</div>
+          <p style="font-size: 0.85rem; line-height: 1.7; color: var(--text-dim); margin: 0;">Supply chain diversification through non-Hormuz routes becomes permanent strategy, not contingency planning.</p>
+        </div>
+        <div style="border-left: 1px solid var(--border); padding-left: 2rem;">
+          <div style="font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.4rem;">So What</div>
+          <p style="font-size: 0.85rem; line-height: 1.7; color: var(--text); margin: 0;">If your supply chain has a single chokepoint through the Strait, you need a second route. Overland through Oman, air freight for critical goods, or pre-positioned inventory outside the Gulf. This is not a drill &mdash; it is the new baseline.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--border); padding: 1.5rem 0; gap: 2rem;">
+        <div>
+          <div style="font-family: var(--font-serif); font-size: 1.05rem; font-weight: 600; color: var(--text-bright); margin-bottom: 0.5rem;">The "Gulf is safe" brand needs rebuilding</div>
+          <p style="font-size: 0.85rem; line-height: 1.7; color: var(--text-dim); margin: 0;">The value proposition that attracted talent, tourists, and investment requires rebuilding through demonstrated resilience, not marketing.</p>
+        </div>
+        <div style="border-left: 1px solid var(--border); padding-left: 2rem;">
+          <div style="font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.4rem;">So What</div>
+          <p style="font-size: 0.85rem; line-height: 1.7; color: var(--text); margin: 0;">Tourism, real estate, financial services, education &mdash; every sector that sold Dubai or Abu Dhabi as a safe hub now competes against a changed perception. Recovery comes from showing the system worked under pressure, not pretending it didn't happen.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--border); padding: 1.5rem 0; gap: 2rem;">
+        <div>
+          <div style="font-family: var(--font-serif); font-size: 1.05rem; font-weight: 600; color: var(--text-bright); margin-bottom: 0.5rem;">Defense tech becomes a growth sector</div>
+          <p style="font-size: 0.85rem; line-height: 1.7; color: var(--text-dim); margin: 0;">Counter-UAS, directed-energy weapons, indigenous defense production &mdash; this becomes a multi-decade investment vertical.</p>
+        </div>
+        <div style="border-left: 1px solid var(--border); padding-left: 2rem;">
+          <div style="font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.4rem;">So What</div>
+          <p style="font-size: 0.85rem; line-height: 1.7; color: var(--text); margin: 0;">Governments across the Gulf will spend heavily on defense technology for a generation. If you are in technology, manufacturing, or services, this is a new market. If you are not, your taxes and operating environment will reflect it.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--border); padding: 1.5rem 0; gap: 2rem;">
+        <div>
+          <div style="font-family: var(--font-serif); font-size: 1.05rem; font-weight: 600; color: var(--text-bright); margin-bottom: 0.5rem;">One data center region is no longer enough</div>
+          <p style="font-size: 0.85rem; line-height: 1.7; color: var(--text-dim); margin: 0;">The AWS Middle East outage proved that digital infrastructure concentrated in one geography is a single point of failure.</p>
+        </div>
+        <div style="border-left: 1px solid var(--border); padding-left: 2rem;">
+          <div style="font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.4rem;">So What</div>
+          <p style="font-size: 0.85rem; line-height: 1.7; color: var(--text); margin: 0;">If your operations, customer data, or payments run through a single cloud region, you are exposed. Multi-region failover is no longer a nice-to-have &mdash; it is table stakes. Budget for it now, before your board asks why you didn't.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="watch-section">
+      <h3>Seven Signals to Watch</h3>
+      <div class="watch-grid">
+        <div class="watch-item">
+          <div class="watch-item-num">01</div>
+          <div class="watch-item-title">Tucker Carlson</div>
+          <p>Editorial position on the campaign. If he flips to support, the MAGA fracture heals and political constraint on escalation evaporates.</p>
+        </div>
+        <div class="watch-item">
+          <div class="watch-item-num">02</div>
+          <div class="watch-item-title">Interceptor Rate</div>
+          <p>Consumption vs. resupply. The gap determines when GCC defenses thin to the point where desalination becomes vulnerable.</p>
+        </div>
+        <div class="watch-item">
+          <div class="watch-item-num">03</div>
+          <div class="watch-item-title">Drone Production</div>
+          <p>Degradation curve and component origin in wreckage. Chinese pipeline status is the key variable.</p>
+        </div>
+        <div class="watch-item">
+          <div class="watch-item-num">04</div>
+          <div class="watch-item-title">Oil Trajectory</div>
+          <p>Sustained $100+ triggers recession dynamics. Bond market stagflation signals accelerate de-escalation pressure.</p>
+        </div>
+        <div class="watch-item">
+          <div class="watch-item-num">05</div>
+          <div class="watch-item-title">The 440 kg</div>
+          <p>Any intelligence on the location or status of unaccounted enriched uranium.</p>
+        </div>
+        <div class="watch-item">
+          <div class="watch-item-num">06</div>
+          <div class="watch-item-title">Iranian Succession</div>
+          <p>Assembly of Experts' decision determines whether a negotiating partner emerges.</p>
+        </div>
+        <div class="watch-item">
+          <div class="watch-item-num">07</div>
+          <div class="watch-item-title">The April Dates</div>
+          <p>War Powers ~April 29. P&I renewal April 1. Hard calendar constraints forcing decisions.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="closing">
+      <p>This is the first conflict since the Second World War to directly impact cities and facilities that serve as hubs in the globalized economy. The scenarios above are not predictions. They are preparations.</p>
+    </div>
+  </section>
+
+  <!-- ==================== 07: FAQ ==================== -->
+  <section class="section" id="faq" role="tabpanel">
+    <h2 class="section-heading">Frequently Asked Questions</h2>
+    <p class="section-subhead">
+      The questions we hear most from UAE-based leadership, answered against the scenario framework.
+    </p>
+
+    <div class="faq-grid">
+
+      <div class="faq-item">
+        <button class="faq-question">How long does this last?</button>
+        <div class="faq-answer">
+          <p>The active military campaign: 3-5 weeks in the base case (Scenario 1, 40-45%), 6-18 months if the US escalates (Scenario 3, 25-30%). But the question that matters for business is different: <strong>how long until the operating environment normalizes?</strong></p>
+          <p>Strait reopening: 3-6 months in the base case, 12-18 months in the Quagmire. Insurance architecture restructuring: 6-12 months minimum regardless of scenario. Tourism recovery to pre-conflict levels: 12-24 months. The military campaign ending does not mean the disruption ends. Plan for the longer timeline.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">Is the UAE safe?</button>
+        <div class="faq-answer">
+          <p>The UAE has absorbed over 1,100 projectiles with three fatalities. The air defense architecture is functioning. The "host, not belligerent" posture is the critical firewall &mdash; it constrains what Iran can target without triggering broader consequences.</p>
+          <p>The risk is not today's defenses but their <strong>depletion rate.</strong> 800+ interceptors consumed in 5 days. At current rates, stocks exhaust in days, not months. The vulnerability window is weeks 3-6, when initial stocks are depleted and emergency resupply has not arrived in quantity. The most exposed infrastructure: desalination plants, which serve a country with 48 hours of water reserves.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">Should we relocate operations?</button>
+        <div class="faq-answer">
+          <p><strong>Not relocate. Duplicate.</strong> Full relocation signals panic, triggers talent departure, and may not be necessary. What you need is a pre-tested redundancy location for critical functions &mdash; IT systems, treasury, customer service, supply chain management.</p>
+          <p>Oman is the fastest option: diplomatically neutral, not hosting coalition forces, geographic proximity, existing trade infrastructure. Bahrain and Qatar have their own exposure. India and Singapore are options for longer-horizon redundancy. The key: <strong>test the failover before you need it.</strong> A redundancy plan that has never been executed is not a plan.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">What happens to oil prices?</button>
+        <div class="faq-answer">
+          <p>Base case (Scenario 1): oil settles to $80-85 after campaign ends, with ~$13/bbl of war risk premium above the $65 fair value identified by Goldman Sachs. Quagmire (Scenario 3): sustained $95-110+. Conflagration (Scenario 4): $120-150+.</p>
+          <p>The structural driver is not combat but <strong>insurance.</strong> Seven P&I clubs withdrew war risk cover. The Strait went from 138 vessel crossings per day to approximately 5. Even after the campaign ends, the insurance architecture must rebuild before shipping normalizes. The April 1 P&I club renewal date is the first hard test of whether the market will return.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">Will the Strait of Hormuz reopen?</button>
+        <div class="faq-answer">
+          <p>It was never physically closed. It was <strong>commercially closed</strong> by the withdrawal of war risk insurance. The distinction matters: physical closure (mining) is a Scenario 4 event requiring months of mine clearance. Commercial closure is an insurance and risk-pricing problem that can resolve faster &mdash; but not instantly.</p>
+          <p>The US DFC announced a $20 billion rolling reinsurance facility on March 6. The April 1 P&I club renewal is the critical milestone. Realistic timeline for meaningful traffic resumption: 3-6 months in the base case. Rerouting via Cape of Good Hope adds 10-19 days per voyage, reducing effective global fleet capacity by 15-20%.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">How do we retain key talent?</button>
+        <div class="faq-answer">
+          <p>The 5-25% high-skilled expatriate departure concentrates in exactly the people hardest to replace: dual-career families with school-age children and professionals with portable skills in finance and technology. Policy memos won't hold them. <strong>Individual conversations will.</strong></p>
+          <p>Priority actions: identify your top 50-100 people by name. Have their direct managers &mdash; not HR &mdash; conduct one-on-one conversations within the next two weeks. Address specific concerns: school continuity, family safety plans, remote work flexibility, retention incentives. The companies that do this in week 2 will outperform those that issue a generic email in week 6.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">What should boards be doing right now?</button>
+        <div class="faq-answer">
+          <p><strong>Three things, in this order:</strong></p>
+          <p><strong>1. Stress-test the balance sheet</strong> against the four scenarios independently. What does your cash position, revenue, and debt service look like at $85 oil vs. $110 oil vs. $140 oil? At 3-month disruption vs. 12-month disruption? Draw credit facilities now, while terms are pre-conflict.</p>
+          <p><strong>2. Establish wartime governance cadence.</strong> Move from quarterly strategic reviews to weekly. Pre-authorize trigger-based decisions so management can act in hours, not wait for the next board meeting. Define the specific scenarios that trigger specific pre-approved actions.</p>
+          <p><strong>3. Track the seven signals.</strong> Assign one person to deliver a daily one-page briefing to the executive team. The 48-hour information advantage is the single greatest differentiator between companies that navigate this well and those that don't.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">Is there a diplomatic off-ramp?</button>
+        <div class="faq-answer">
+          <p>Yes, but it lacks a critical ingredient: <strong>an Iranian negotiating partner.</strong> The Omani mediation infrastructure remains intact &mdash; Iran had agreed to terms on February 27, one day before the strikes destroyed the deal along with the leadership that negotiated it. Saudi back-channel diplomacy has intensified, not diminished.</p>
+          <p>The prerequisites for "The Deal": Iranian succession producing a credible interlocutor, Trump's calculus shifting from "warrior" to "dealmaker" (his strongest political identity), and a Saudi-facilitated back-channel. The diplomatic track runs beneath all four scenarios. It is not a separate outcome &mdash; it is a mechanism that could interrupt any trajectory, given the right conditions.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">What's the worst case for GCC economies?</button>
+        <div class="faq-answer">
+          <p>Scenario 4 (5-10% probability): sustained oil at $120-150+, Strait physically mined with months-long clearance, Qatar's LNG offline, tourism collapsed, AWS-type outages recurring, 20-25% expatriate departure, and the insurance market refusing to re-enter the region for years. Oxford Economics projects world GDP reduced by 0.3%; US -0.4%; Eurozone -0.5% below baseline.</p>
+          <p>The GCC's structural advantage in that scenario: $6 trillion in sovereign wealth &mdash; 40%+ of the global total. The Gulf states are among the few actors in this conflict who can absorb sustained economic damage without systemic failure. The question is not survival but <strong>competitive positioning on the other side.</strong></p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">How does China factor in?</button>
+        <div class="faq-answer">
+          <p>China's exposure is acute: 45-50% of Chinese crude imports transit Hormuz (~5.5-5.8M bpd). Overland pipeline spare capacity replaces only 4-7% of the shortfall. Sustained price increases add ~$210B/year to China's import bill.</p>
+          <p>But China's response is constrained. Its naval presence in the Gulf is a flag-showing force, not combat-capable. The Taiwan binding constraint absorbs PLA capacity. China cannot protect its own tankers &mdash; Houthis hit a Chinese-linked vessel in March 2024. China's most likely posture: diplomatic pressure for ceasefire, accelerated overland energy diversification, and quiet support for Iranian drone production through its supply chain. Beijing is exposed but paralyzed.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <p>Scenario-2026-001</p>
+    <p>08 March 2026</p>
+  </div>
+</footer>
+
+<script>
+// Login gate
+function handleLogin(e) {
+  e.preventDefault();
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  if (u === 'EMIR' && p === 'EMIR1234') {
+    document.getElementById('loginGate').classList.add('hidden');
+    sessionStorage.setItem('auth', '1');
+  } else {
+    document.getElementById('loginError').textContent = 'Invalid credentials';
+    document.getElementById('loginPass').value = '';
+  }
+  return false;
+}
+// Persist within session
+if (sessionStorage.getItem('auth') === '1') {
+  document.getElementById('loginGate').classList.add('hidden');
+}
+
+// Tab navigation
+const tabs = document.querySelectorAll('.nav-tab');
+const sections = document.querySelectorAll('.section');
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    const target = tab.dataset.tab;
+    tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    sections.forEach(s => {
+      s.classList.remove('active');
+      if (s.id === target) s.classList.add('active');
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+// Scenario matrix interaction
+function showScenario(name) {
+  const cells = document.querySelectorAll('.matrix-cell');
+  cells.forEach(c => c.classList.remove('active'));
+  const activeCell = document.querySelector(`[data-scenario="${name}"]`);
+  if (activeCell) activeCell.classList.add('active');
+  const details = document.querySelectorAll('.scenario-detail');
+  details.forEach(d => d.classList.remove('active'));
+  const activeDetail = document.getElementById(`detail-${name}`);
+  if (activeDetail) {
+    activeDetail.classList.add('active');
+    activeDetail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+// FAQ accordion
+document.querySelectorAll('.faq-question').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.parentElement;
+    const wasOpen = item.classList.contains('open');
+    // Close all
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    // Toggle clicked
+    if (!wasOpen) item.classList.add('open');
+  });
+});
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  const currentIndex = Array.from(tabs).findIndex(t => t.classList.contains('active'));
+  if (e.key === 'ArrowRight' && currentIndex < tabs.length - 1) {
+    tabs[currentIndex + 1].click();
+  } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
+    tabs[currentIndex - 1].click();
+  }
+});
+
+// Staggered entrance animation
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      entry.target.style.animationDelay = `${i * 0.05}s`;
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.advantage-card, .watch-item, .shift-item, .player-card').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(8px)';
+  el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+  observer.observe(el);
+});
+
+const style = document.createElement('style');
+style.textContent = '.visible { opacity: 1 !important; transform: translateY(0) !important; }';
+document.head.appendChild(style);
+</script>
+
+</body>
+</html>
